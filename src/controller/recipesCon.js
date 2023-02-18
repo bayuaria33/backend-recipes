@@ -55,6 +55,7 @@ const recipesController = {
     data.ingredients = req.body.ingredients;
     data.photo = req.body.photo;
     data.users_id = req.body.users_id;
+    data.categories_id = req.body.categories_id;
 
     let result = await insertDataRecipe(data);
 

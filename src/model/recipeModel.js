@@ -17,8 +17,8 @@ const selectDataRecipeById = (data) => {
 };
 
 const insertDataRecipe = (data) => {
-  let { title, ingredients, photo, users_id} = data;
-  let qry = `INSERT INTO recipes(title,ingredients,photo,users_id,created_at) VALUES('${title}','${ingredients}','${photo}',${users_id},NOW()::timestamp) `;
+  let { title, ingredients, photo, users_id,categories_id} = data;
+  let qry = `INSERT INTO recipes(title,ingredients,photo,users_id,created_at, categories_id) VALUES('${title}','${ingredients}','${photo}',${users_id},NOW()::timestamp, ${categories_id}) `;
   // console.log(data, query);
   return Pool.query(qry);
 };
