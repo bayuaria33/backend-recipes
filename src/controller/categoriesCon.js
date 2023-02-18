@@ -7,15 +7,15 @@ const {
   } = require("../model/categoryModel");
   
   const categoriesController = {
-    getAllCategories: async (request, response, next) => {
+    getAllCategories: async (req, res, next) => {
       let showCategory = await selectDataCategory();
       if (!showCategory) {
-        response
+        res
           .status(400)
           .json({ status: 400, message: `data category not found` });
       }
   
-      response
+      res
         .status(200)
         .json({ status: 200, message: `data found`, data: showCategory.rows });
     },

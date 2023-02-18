@@ -7,8 +7,8 @@ const {
 } = require("../model/userModel");
 
 const usersController = {
-  getAllUsers: async (request, response, next) => {
-    let { searchBy, search, sortBy, sort } = request.query;
+  getAllUsers: async (req, res, next) => {
+    let { searchBy, search, sortBy, sort } = req.query;
 
     let data = {
       searchBy: searchBy || "name",
@@ -16,17 +16,17 @@ const usersController = {
       sortBy: sortBy || "name",
       sort: sort || "ASC",
     };
-    data.page = parseInt(request.query.page) || 1;
-    data.limit = parseInt(request.query.limit) || 5;
+    data.page = parseInt(req.query.page) || 1;
+    data.limit = parseInt(req.query.limit) || 5;
     data.offset = (data.page - 1) * data.limit;
     let showUser = await selectDataUser(data);
     if (!showUser) {
-      response
+      res
         .status(400)
         .json({ status: 400, message: `data user not found` });
     }
 
-    response
+    res
       .status(200)
       .json({ status: 200, message: `data found`, data: showUser.rows });
   },

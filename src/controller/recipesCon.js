@@ -7,8 +7,8 @@ const {
 } = require("../model/recipeModel");
 
 const recipesController = {
-  getAllRecipes: async (request, response, next) => {
-    let { searchBy, search, sortBy, sort } = request.query;
+  getAllRecipes: async (req, res, next) => {
+    let { searchBy, search, sortBy, sort } = req.query;
 
     let data = {
       searchBy: searchBy || "title",
@@ -16,17 +16,17 @@ const recipesController = {
       sortBy: sortBy || "created_at",
       sort: sort || "ASC",
     };
-    data.page = parseInt(request.query.page) || 1;
-    data.limit = parseInt(request.query.limit) || 5;
+    data.page = parseInt(req.query.page) || 1;
+    data.limit = parseInt(req.query.limit) || 5;
     data.offset = (data.page - 1) * data.limit;
     let showRecipe = await selectDataRecipe(data);
 
     if (!showRecipe) {
-      response
+      res
         .status(400)
         .json({ status: 400, message: `data recipe not found` });
     }
-    response.status(200).json({
+    res.status(200).json({
       status: 200,
       message: `data recipe found`,
       data: showRecipe.rows,
