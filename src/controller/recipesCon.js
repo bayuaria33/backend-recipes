@@ -22,9 +22,7 @@ const recipesController = {
     let showRecipe = await selectDataRecipe(data);
 
     if (!showRecipe) {
-      res
-        .status(400)
-        .json({ status: 400, message: `data recipe not found` });
+      res.status(400).json({ status: 400, message: `data recipe not found` });
     }
     res.status(200).json({
       status: 200,
@@ -35,9 +33,15 @@ const recipesController = {
 
   getRecipeById: async (req, res, next) => {
     let id = req.params.id;
+    let foundRecipe = null;
     let showRecipe = await selectDataRecipeById(id);
+    showRecipe.rows.map((item) => {
+      if (item.id == id) {
+        foundRecipe = item;
+      }
+    });
     console.log(showRecipe.rows);
-    if (!showRecipe) {
+    if (!foundRecipe) {
       res.status(400).json({ status: 400, message: `data recipe not found` });
     }
     res

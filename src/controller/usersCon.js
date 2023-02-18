@@ -21,9 +21,7 @@ const usersController = {
     data.offset = (data.page - 1) * data.limit;
     let showUser = await selectDataUser(data);
     if (!showUser) {
-      res
-        .status(400)
-        .json({ status: 400, message: `data user not found` });
+      res.status(400).json({ status: 400, message: `data user not found` });
     }
 
     res
@@ -33,10 +31,15 @@ const usersController = {
 
   getUserById: async (req, res, next) => {
     let id = req.params.id;
-    // let foundUser = null;
+    let foundUser = null;
     let showUser = await selectDataUserById(id);
+    showUser.rows.map((item) => {
+      if (item.id == id) {
+        foundUser = item;
+      }
+    });
     console.log(showUser.rows);
-    if (!showUser) {
+    if (!foundUser) {
       res.status(400).json({ status: 400, message: `data user not found` });
     }
     res
