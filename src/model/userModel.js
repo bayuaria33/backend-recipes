@@ -8,7 +8,7 @@ const selectDataUser = (data) => {
 };
 
 const selectDataUserById = (data) => {
-  let qry = `SELECT * FROM users WHERE id='${data}'`;
+  let qry = `SELECT * FROM users WHERE id='${data}' and deleted_at IS NULL`;
   // console.log(data, query);
   return Pool.query(qry);
 };
@@ -29,7 +29,7 @@ const updateDataUser = (id, data) => {
 
 const deleteDataUser = (id) => {
   let qry = `UPDATE users SET deleted_at = NOW()::timestamp WHERE id=${id}`;
-  console.log(id, qry);
+  // console.log(id, qry);
   return Pool.query(qry);
 };
 
