@@ -6,6 +6,7 @@ const cors = require("cors");
 const app = express();
 const port = 3000;
 const mainRoute = require(`./src/routes/index`)
+const apiErrorHandler = require('./src/middleware/error/api-error-handler');
 app.use(cors({
   origin: "*",
   method:"*"
@@ -27,6 +28,7 @@ app.all("*",(req,res,next)=> {
 })
 
 // console.log(process.env.DB_NAME);
+app.use(apiErrorHandler);
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
 });
