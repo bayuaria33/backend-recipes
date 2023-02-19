@@ -16,6 +16,12 @@ const selectDataRecipeById = (data) => {
   return Pool.query(qry);
 };
 
+//khusus untuk function insert
+const selectDataRecipeByIdForPut = (data)=>{
+  let qry = `SELECT * FROM recipes WHERE id=${data}`;
+  return Pool.query(qry);
+}
+
 const insertDataRecipe = (data) => {
   let { title, ingredients, photo, users_id,categories_id} = data;
   let qry = `INSERT INTO recipes(title,ingredients,photo,users_id,created_at, categories_id) VALUES('${title}','${ingredients}','${photo}',${users_id},NOW()::timestamp, ${categories_id}) `;
@@ -49,6 +55,7 @@ module.exports = {
   selectDataRecipe,
   insertDataRecipe,
   selectDataRecipeById,
+  selectDataRecipeByIdForPut,
   updateDataRecipe,
   deleteDataRecipe,
 };
