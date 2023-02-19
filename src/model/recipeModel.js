@@ -11,7 +11,7 @@ const selectDataRecipe = (data) => {
 };
 
 const selectDataRecipeById = (data) => {
-  let qry = `SELECT title,ingredients,created_at, users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN users ON users_id=users.id WHERE recipes.id='${data}'`;
+  let qry = `SELECT title,ingredients,created_at, users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN users ON users_id=users.id WHERE recipes.id='${data}' AND recipes.deleted_at IS NULL`;
   // console.log(data, query);
   return Pool.query(qry);
 };
