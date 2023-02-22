@@ -4,14 +4,14 @@ const Pool = require("./../config/dbconfig");
 const selectDataRecipe = (data) => {
   let { searchBy, search, sortBy, sort,limit,offset} = data;
   console.log({data});
-  let qry = `SELECT recipes.title,recipes.ingredients,recipes.created_at, users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN users ON users_id=users.id WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+  let qry = `SELECT recipes.title,recipes.ingredients,recipes.created_at, old_users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN old_users ON users_id=old_users.id WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
   console.log(data,qry);
 
   return Pool.query(qry);
 };
 
 const selectDataRecipeById = (data) => {
-  let qry = `SELECT title,ingredients,created_at, users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN users ON users_id=users.id WHERE recipes.id='${data}' AND recipes.deleted_at IS NULL`;
+  let qry = `SELECT title,ingredients,created_at, old_users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN old_users ON users_id=old_users.id WHERE recipes.id='${data}' AND recipes.deleted_at IS NULL`;
   // console.log(data, query);
   return Pool.query(qry);
 };
