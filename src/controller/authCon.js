@@ -6,7 +6,8 @@ const ApiResult = require("../middleware/error/ApiResult");
 const UsersController = {
   registerUser: async (req, res, next) => {
     if (!req.body.email || !req.body.password || !req.body.name) {
-      d;
+      next(ApiResult.badRequest(`Bad request, Email / Password / name missing`));
+      return;
     }
 
     // console.log(req.body.email);
