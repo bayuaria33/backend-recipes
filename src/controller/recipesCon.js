@@ -1,4 +1,4 @@
-const ApiError = require("../middleware/error/ApiError");
+const ApiResult = require("../middleware/error/ApiResult");
 
 const {
   selectDataRecipe,
@@ -25,7 +25,7 @@ const recipesController = {
       let showRecipe = await selectDataRecipe(data);
       if (showRecipe.rows.length === 0) {
         next(
-          ApiError.badRequest(
+          ApiResult.badRequest(
             `Data not Found, recipe with ${data.searchBy} = ${data.search} does not exist`
           )
         );
@@ -38,7 +38,7 @@ const recipesController = {
         data: showRecipe.rows,
       });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message: ${error.message}`));
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
 
@@ -46,7 +46,7 @@ const recipesController = {
     try {
       let id = req.params.id;
       if (isNaN(id)) {
-        next(ApiError.badRequest(`Bad Request, id is not a number`));
+        next(ApiResult.badRequest(`Bad Request, id is not a number`));
         return;
       }
       let showRecipe = await selectDataRecipeById(id);
@@ -54,14 +54,14 @@ const recipesController = {
       let foundRecipe = showRecipe.rows[0];
       console.log(foundRecipe);
       if (!foundRecipe) {
-        next(ApiError.badRequest(`Bad Request, data recipe not found`));
+        next(ApiResult.badRequest(`Bad Request, data recipe not found`));
         return;
       }
       res
         .status(200)
         .json({ status: 200, message: `data found`, data: showRecipe.rows });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message: ${error.message}`));
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
 
@@ -75,14 +75,14 @@ const recipesController = {
       data.categories_id = req.body.categories_id;
       let result = await insertDataRecipe(data);
       if (!result) {
-        next(ApiError.badRequest(`Failed to insert recipe data`));
+        next(ApiResult.badRequest(`Failed to insert recipe data`));
         return;
       }
       res
         .status(200)
         .json({ status: 200, message: `data inserted succesfully` });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message: ${error.message}`));
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
 
@@ -102,7 +102,7 @@ const recipesController = {
       };
       result = await updateDataRecipe(id, data);
       if (!result) {
-        next(ApiError.badRequest(`Update data recipe failed`));
+        next(ApiResult.badRequest(`Update data recipe failed`));
       }
       let checkData = await selectDataRecipeById(id);
       console.log(`cek data = ${checkData}`);
@@ -112,7 +112,7 @@ const recipesController = {
         data: checkData.rows,
       });
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiResult.badRequest(error.message));
     }
   },
 
@@ -122,12 +122,12 @@ const recipesController = {
       let showRecipe = await selectDataRecipeByIdForPut(id);
       let currentRecipe = showRecipe.rows[0];
       if (!currentRecipe) {
-        next(ApiError.badRequest(`Recipe with id ${id} does not exist`));
+        next(ApiResult.badRequest(`Recipe with id ${id} does not exist`));
         return;
       }
       let result = await deleteDataRecipe(id);
       if (!result) {
-        next(ApiError.badRequest(`Delete data recipe failed`));
+        next(ApiResult.badRequest(`Delete data recipe failed`));
         return;
       }
       res.status(200).json({
@@ -136,7 +136,7 @@ const recipesController = {
         data: `${id} deleted`,
       });
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiResult.badRequest(error.message));
     }
   },
 };

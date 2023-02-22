@@ -1,4 +1,4 @@
-const ApiError = require("../middleware/error/ApiError");
+const ApiResult = require("../middleware/error/ApiResult");
 
 const {
   selectDataCategory,
@@ -24,7 +24,7 @@ const categoriesController = {
       let showCategory = await selectDataCategory(data);
       if (showCategory.rows.length === 0) {
         next(
-          ApiError.badRequest(
+          ApiResult.badRequest(
             `Data not Found, category with ${data.searchBy} = ${data.search} does not exist`
           )
         );
@@ -34,7 +34,7 @@ const categoriesController = {
         .status(200)
         .json({ status: 200, message: `data found`, data: showCategory.rows });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
 
@@ -50,14 +50,14 @@ const categoriesController = {
       });
       console.log(showCategory.rows);
       if (!foundCategory) {
-        next(ApiError.badRequest(`Bad request, data category not found`));
+        next(ApiResult.badRequest(`Bad request, data category not found`));
         return;
       }
       res
         .status(200)
         .json({ status: 200, message: `data found`, data: showCategory.rows });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
 
@@ -67,12 +67,12 @@ const categoriesController = {
       data.category_name = req.body.category_name;
       let result = await insertDataCategory(data);
       if (!result) {
-        next(ApiError.badRequest(`Failed to insert category data`));
+        next(ApiResult.badRequest(`Failed to insert category data`));
         return;
       }
       res.status(200).json({ status: 200, message: `data inserted` });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
 
@@ -88,7 +88,7 @@ const categoriesController = {
       };
       result = await updateDataCategory(id, data);
       if (!result) {
-        next(ApiError.badRequest(`Update data category failed`));
+        next(ApiResult.badRequest(`Update data category failed`));
         return;
       }
       let checkData = await selectDataCategoryById(id);
@@ -98,7 +98,7 @@ const categoriesController = {
         data: checkData.rows,
       });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
 
@@ -108,12 +108,12 @@ const categoriesController = {
       let showCategory = await selectDataCategoryById(id);
       let currentCategory = showCategory.rows[0];
       if (!currentCategory) {
-        next(ApiError.badRequest(`Category with id ${id} does not exist`));
+        next(ApiResult.badRequest(`Category with id ${id} does not exist`));
         return;
       }
       let result = await deleteDataCategory(id);
       if (!result) {
-        next(ApiError.badRequest(`Delete data category failed`));
+        next(ApiResult.badRequest(`Delete data category failed`));
         return;
       }
       res.status(200).json({
@@ -122,7 +122,7 @@ const categoriesController = {
         data: `${id} deleted`,
       });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
 };

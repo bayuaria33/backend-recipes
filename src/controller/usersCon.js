@@ -1,4 +1,4 @@
-const ApiError = require("../middleware/error/ApiError");
+const ApiResult = require("../middleware/error/ApiResult");
 
 const {
   selectDataUser,
@@ -24,7 +24,7 @@ const usersController = {
       let showUser = await selectDataUser(data);
       if (showUser.rows.length === 0) {
         next(
-          ApiError.badRequest(
+          ApiResult.badRequest(
             `Data not Found, user with ${data.searchBy} = ${data.search} does not exist`
           )
         );
@@ -34,7 +34,7 @@ const usersController = {
         .status(200)
         .json({ status: 200, message: `data found`, data: showUser.rows });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message: ${error.message}`));
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
 
@@ -44,7 +44,7 @@ const usersController = {
       let foundUser = null;
       //guard clause
       if (isNaN(id)) {
-        next(ApiError.badRequest(`Bad Request, id is not a number`));
+        next(ApiResult.badRequest(`Bad Request, id is not a number`));
         return;
       }
       let showUser = await selectDataUserById(id);
@@ -55,30 +55,30 @@ const usersController = {
       });
       console.log(showUser.rows);
       if (!foundUser) {
-        next(ApiError.badRequest(`Bad Request, data user not found`));
+        next(ApiResult.badRequest(`Bad Request, data user not found`));
         return;
       }
       res
         .status(200)
         .json({ status: 200, message: `data found`, data: showUser.rows });
     } catch (error) {
-      next(ApiError.badRequest(`Error, message = ${error.message}`));
+      next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
   },
   //getuser versi then catch
   // getUserById: async (req, res, next) => {
   //   if (isNaN(req.params.id)) {
-  //     next(ApiError.badRequest(`Bad Request, id is not a number`));
+  //     next(ApiResult.badRequest(`Bad Request, id is not a number`));
   //   }
   //   await selectDataUserById(req.params.id).then((result)=>{
   //     if(!result.rows[0]){
-  //       next(ApiError.badRequest(`Data not found`));
+  //       next(ApiResult.badRequest(`Data not found`));
   //     }
   //     res
   //     .status(200)
   //     .json({ status: 200, message: `Data found`, data: result.rows });
   //   }).catch((error)=>{
-  //     next(ApiError.badRequest(error.message));
+  //     next(ApiResult.badRequest(error.message));
   //   })
   // },
 
@@ -91,12 +91,12 @@ const usersController = {
       data.password = req.body.password;
       let result = await insertDataUser(data);
       if (!result) {
-        next(ApiError.badRequest(`Failed to insert user data`));
+        next(ApiResult.badRequest(`Failed to insert user data`));
         return;
       }
       res.status(200).json({ status: 200, message: `Data user inserted` });
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiResult.badRequest(error.message));
     }
   },
 
@@ -106,7 +106,7 @@ const usersController = {
       let showUser = await selectDataUserById(id);
       let currentUser = showUser.rows[0];
       if (!currentUser) {
-        next(ApiError.badRequest(`User with id ${id} does not exist`));
+        next(ApiResult.badRequest(`User with id ${id} does not exist`));
         return;
       }
       //cek if undefined
@@ -115,10 +115,10 @@ const usersController = {
         email: req.body.email || currentUser.email,
         phonenumber: req.body.phonenumber || currentUser.phonenumber,
         password: req.body.password || currentUser.password,
-      }; 
+      };
       result = await updateDataUser(id, data);
       if (!result) {
-        next(ApiError.badRequest(`Update data user failed`));
+        next(ApiResult.badRequest(`Update data user failed`));
         return;
       }
       let checkData = await selectDataUserById(id);
@@ -128,7 +128,7 @@ const usersController = {
         data: checkData.rows,
       });
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiResult.badRequest(error.message));
     }
   },
 
@@ -138,12 +138,12 @@ const usersController = {
       let showUser = await selectDataUserById(id);
       let currentUser = showUser.rows[0];
       if (!currentUser) {
-        next(ApiError.badRequest(`User with id ${id} does not exist`));
+        next(ApiResult.badRequest(`User with id ${id} does not exist`));
         return;
       }
       let result = await deleteDataUser(id);
-      if(!result){
-        next(ApiError.badRequest(`Delete data user failed`));
+      if (!result) {
+        next(ApiResult.badRequest(`Delete data user failed`));
         return;
       }
       res.status(200).json({
@@ -152,7 +152,7 @@ const usersController = {
         data: `${id} deleted`,
       });
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiResult.badRequest(error.message));
     }
   },
 };
