@@ -30,9 +30,7 @@ const categoriesController = {
         );
         return;
       }
-      res
-        .status(200)
-        .json({ status: 200, message: `data found`, data: showCategory.rows });
+      next(ApiResult.success(`Data found`, showCategory.rows))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
@@ -53,9 +51,7 @@ const categoriesController = {
         next(ApiResult.badRequest(`Bad request, data category not found`));
         return;
       }
-      res
-        .status(200)
-        .json({ status: 200, message: `data found`, data: showCategory.rows });
+      next(ApiResult.success(`Data found`, showCategory.rows))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
@@ -70,7 +66,7 @@ const categoriesController = {
         next(ApiResult.badRequest(`Failed to insert category data`));
         return;
       }
-      res.status(200).json({ status: 200, message: `data inserted` });
+      next(ApiResult.success(`Data inserted successfully`, `${id} deleted`))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
@@ -92,11 +88,7 @@ const categoriesController = {
         return;
       }
       let checkData = await selectDataCategoryById(id);
-      res.status(200).json({
-        status: 200,
-        message: `update data category success`,
-        data: checkData.rows,
-      });
+      next(ApiResult.success(`Update data category successful`, checkData.rows))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
@@ -116,11 +108,7 @@ const categoriesController = {
         next(ApiResult.badRequest(`Delete data category failed`));
         return;
       }
-      res.status(200).json({
-        status: 200,
-        message: `delete data success`,
-        data: `${id} deleted`,
-      });
+      next(ApiResult.success(`Delete data category successful`, `${id} deleted`))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }

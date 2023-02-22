@@ -31,12 +31,7 @@ const recipesController = {
         );
         return;
       }
-
-      res.status(200).json({
-        status: 200,
-        message: `data recipe found`,
-        data: showRecipe.rows,
-      });
+      next(ApiResult.success(`Data recipe found`, showRecipe.rows))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
@@ -78,9 +73,7 @@ const recipesController = {
         next(ApiResult.badRequest(`Failed to insert recipe data`));
         return;
       }
-      res
-        .status(200)
-        .json({ status: 200, message: `data inserted succesfully` });
+      next(ApiResult.success(`Data inserted successfully`))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
@@ -90,15 +83,16 @@ const recipesController = {
     try {
       let result;
       let id = req.params.id;
-      let showRecipe = await selectDataRecipeByIdForPut(id);
-      let currentRecipe = showRecipe.rows[0];
+      let {
+        rows: [recipes],
+      } = await selectDataRecipeByIdForPut(id);
       let data = {
-        title: req.body.title || currentRecipe.title,
-        ingredients: req.body.ingredients || currentRecipe.ingredients,
-        photo: req.body.photo || currentRecipe.photo,
-        created_at: req.body.created_at || currentRecipe.created_at,
-        users_id: req.body.users_id || currentRecipe.users_id,
-        categories_id: req.body.categories_id || currentRecipe.categories_id,
+        title: req.body.title || recipes.title,
+        ingredients: req.body.ingredients || recipes.ingredients,
+        photo: req.body.photo || recipes.photo,
+        created_at: req.body.created_at || recipes.created_at,
+        users_id: req.body.users_id || recipes.users_id,
+        categories_id: req.body.categories_id || recipes.categories_id,
       };
       result = await updateDataRecipe(id, data);
       if (!result) {
@@ -106,11 +100,7 @@ const recipesController = {
       }
       let checkData = await selectDataRecipeById(id);
       console.log(`cek data = ${checkData}`);
-      res.status(200).json({
-        status: 200,
-        message: `update data success`,
-        data: checkData.rows,
-      });
+      next(ApiResult.success(`Update data recipe successful`, checkData.rows))
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }
@@ -119,9 +109,10 @@ const recipesController = {
   deleteDataRecipe: async (req, res, next) => {
     try {
       let id = req.params.id;
-      let showRecipe = await selectDataRecipeByIdForPut(id);
-      let currentRecipe = showRecipe.rows[0];
-      if (!currentRecipe) {
+      let {
+        rows: [recipes],
+      } = await selectDataRecipeByIdForPut(id);
+      if (!recipes) {
         next(ApiResult.badRequest(`Recipe with id ${id} does not exist`));
         return;
       }
@@ -130,11 +121,7 @@ const recipesController = {
         next(ApiResult.badRequest(`Delete data recipe failed`));
         return;
       }
-      res.status(200).json({
-        status: 200,
-        message: `Delete data recipe successful`,
-        data: `${id} deleted`,
-      });
+      next(ApiResult.success(`Delete data recipe successful`, `${id} deleted`))
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }

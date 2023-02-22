@@ -1,24 +1,25 @@
 class ApiResult {
-  constructor(code, message) {
+  constructor(code, message,data) {
     this.code = code;
     this.message = message;
+    this.data = data;
   }
 
-  static badRequest(msg) {
-    return new ApiResult(400, msg);
+  static badRequest(msg,data) {
+    return new ApiResult(400, msg, data);
   }
-  static unauthorized(msg) {
-    return new ApiResult(401, msg);
+  static unauthorized(msg,data) {
+    return new ApiResult(401, msg, data);
   }
-  static internal(msg) {
-    return new ApiResult(500, msg);
+  static internal(msg,data) {
+    return new ApiResult(500, msg, data);
   }
 
-  static success(msg) {
-    return new ApiResult(200, msg);
+  static success(msg,data) {
+    return new ApiResult(200, msg, data);
   }
-  static createSuccess(msg) {
-    return new ApiResult(201, msg);
+  static createSuccess(msg,data) {
+    return new ApiResult(201, msg, data);
   }
 }
 
