@@ -33,6 +33,33 @@ const deleteDataUser = (id) => {
   return Pool.query(qry);
 };
 
+const findUser = (email) => {
+  let qry = `SELECT * FROM users WHERE email='${email}'`;
+  return new Promise((resolve, reject) =>
+    Pool.query(qry, (err, result) => {
+      if (!err) {
+        resolve(result);
+      } else {
+        reject(err);
+      }
+    })
+  );
+};
+
+const createUser = (data) => {
+  const { email, fullname, password, id } = data;
+  let qry = `INSERT INTO users(id,email,fullname,password) VALUES('${id}','${email}','${fullname}','${password}')`;
+  console.log(data);
+  return new Promise((resolve, reject) =>
+    Pool.query(qry, (err, result) => {
+      if (!err) {
+        resolve(result);
+      } else {
+        reject(err);
+      }
+    })
+  );
+};
 
 module.exports = {
   selectDataUser,
@@ -40,4 +67,6 @@ module.exports = {
   selectDataUserById,
   updateDataUser,
   deleteDataUser,
+  createUser,
+  findUser,
 };
