@@ -2,19 +2,24 @@ const { query } = require("express");
 const Pool = require("./../config/dbconfig");
 
 const selectDataRecipe = (data) => {
-  let { searchBy, search, sortBy, sort,limit,offset} = data;
-  console.log({data});
-  let qry = `SELECT recipes.title,recipes.ingredients,recipes.created_at, old_users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN old_users ON users_id=old_users.id WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
-  console.log(data,qry);
-
-  return Pool.query(qry);
-};
+  let {searchBy,search,sortBy,sort} = data
+  return Pool.query(
+    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category 
+    FROM recipes 
+    JOIN categories ON recipes.categories_id=categories.id
+    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort}`
+  );
+}
 
 const selectDataRecipeById = (data) => {
-  let qry = `SELECT title,ingredients,created_at, old_users.name as author, categories.category_name as category FROM recipes JOIN categories ON recipes.categories_id=categories.id JOIN old_users ON users_id=old_users.id WHERE recipes.id='${data}' AND recipes.deleted_at IS NULL`;
-  // console.log(data, query);
-  return Pool.query(qry);
-};
+  let {searchBy,search,sortBy,sort,id} = data
+  return Pool.query(
+    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category 
+    FROM recipes 
+    JOIN categories ON recipes.categories_id=categories.id
+    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.users_id='${id}' ORDER BY recipes.${sortBy} ${sort}`
+  );
+}
 
 //khusus untuk function insert
 const selectDataRecipeByIdForPut = (data)=>{
@@ -24,7 +29,8 @@ const selectDataRecipeByIdForPut = (data)=>{
 
 const insertDataRecipe = (data) => {
   let { title, ingredients, photo, users_id,categories_id} = data;
-  let qry = `INSERT INTO recipes(title,ingredients,photo,users_id,created_at, categories_id) VALUES('${title}','${ingredients}','${photo}',${users_id},NOW()::timestamp, ${categories_id}) `;
+  let qry = `INSERT INTO recipes(title,ingredients,photo,users_id,created_at, categories_id) 
+  VALUES('${title}','${ingredients}','${photo}','${users_id}',NOW()::timestamp, ${categories_id}) `;
   // console.log(data, query);
   return Pool.query(qry);
 };
@@ -38,12 +44,6 @@ const updateDataRecipe = (id, data) => {
   console.log(`created at : ${created_at}` );
   return Pool.query(qry);
 };
-
-// const deleteDataRecipe = (id) => {
-//   let qry = `DELETE FROM recipes WHERE id=${id}`;
-//   console.log(id, qry);
-//   return Pool.query(qry);
-// };
 
 const deleteDataRecipe = (id) => {
   let qry = `UPDATE recipes SET deleted_at = NOW()::timestamp WHERE id=${id}`;

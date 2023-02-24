@@ -36,28 +36,23 @@ const recipesController = {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
+    getRecipeById: async (req,res,next) => {
+      let {searchBy,search,sortBy,sort} = req.query
+      let data = {
+          searchBy: searchBy || 'title',
+          search: search || '',
+          sortBy: sortBy || 'created_at',
+          sort: sort || 'ASC',
+          id: req.payload.id
+      }
 
-  getRecipeById: async (req, res, next) => {
-    try {
-      let id = req.params.id;
-      if (isNaN(id)) {
-        next(ApiResult.badRequest(`Bad Request, id is not a number`));
-        return;
+      let result = await selectDataRecipeById(data)
+
+      if(!result){
+          res.status(404).json({status:404,message:`get data failed`})
       }
-      let showRecipe = await selectDataRecipeById(id);
-      console.log(`showrecipe = `);
-      let foundRecipe = showRecipe.rows[0];
-      console.log(foundRecipe);
-      if (!foundRecipe) {
-        next(ApiResult.badRequest(`Bad Request, data recipe not found`));
-        return;
-      }
-      res
-        .status(200)
-        .json({ status: 200, message: `data found`, data: showRecipe.rows });
-    } catch (error) {
-      next(ApiResult.badRequest(`Error, message: ${error.message}`));
-    }
+
+      res.status(200).json({status:200,message:`get data success `,data:result.rows})
   },
 
   postDataRecipe: async (req, res, next) => {
@@ -66,7 +61,7 @@ const recipesController = {
       data.title = req.body.title;
       data.ingredients = req.body.ingredients;
       data.photo = req.body.photo;
-      data.users_id = req.body.users_id;
+      data.users_id = req.payload.id;
       data.categories_id = req.body.categories_id;
       let result = await insertDataRecipe(data);
       if (!result) {
@@ -91,7 +86,7 @@ const recipesController = {
         ingredients: req.body.ingredients || recipes.ingredients,
         photo: req.body.photo || recipes.photo,
         created_at: req.body.created_at || recipes.created_at,
-        users_id: req.body.users_id || recipes.users_id,
+        users_id: req.payload.id || recipes.users_id,
         categories_id: req.body.categories_id || recipes.categories_id,
       };
       result = await updateDataRecipe(id, data);

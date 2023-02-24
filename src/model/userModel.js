@@ -47,8 +47,8 @@ const findUser = (email) => {
 };
 
 const createUser = (data) => {
-  const { email, fullname, password, id } = data;
-  let qry = `INSERT INTO users(id,email,fullname,password) VALUES('${id}','${email}','${fullname}','${password}')`;
+  const { email, fullname, password, otp, id } = data;
+  let qry = `INSERT INTO users(id,email,fullname,password,otp) VALUES('${id}','${email}','${fullname}','${password}','${otp}')`;
   console.log(data);
   return new Promise((resolve, reject) =>
     Pool.query(qry, (err, result) => {
@@ -61,6 +61,19 @@ const createUser = (data) => {
   );
 };
 
+const verifyUser = (id)=>{
+  let qry = `UPDATE users SET verified = true WHERE id='${id}'`
+  return new Promise((resolve, reject) =>
+    Pool.query(qry, (err, result) => {
+      if (!err) {
+        resolve(result);
+      } else {
+        reject(err);
+      }
+    })
+  );
+}
+
 module.exports = {
   selectDataUser,
   insertDataUser,
@@ -69,4 +82,5 @@ module.exports = {
   deleteDataUser,
   createUser,
   findUser,
+  verifyUser
 };

@@ -1,7 +1,9 @@
+const ApiResult = require("../middleware/error/ApiResult");
 const { findUser, createUser } = require("./../model/userModel");
 const { v4: uuidv4 } = require("uuid");
 const argon2 = require("argon2");
-const ApiResult = require("../middleware/error/ApiResult");
+const generateToken = require('../helpers/generateToken')
+// const email = require("../middleware/email")
 
 const UsersController = {
   registerUser: async (req, res, next) => {
@@ -49,13 +51,17 @@ const UsersController = {
     } = await findUser(req.body.email);
 
     let verifyPassword = await argon2.verify(users.password, req.body.password);
+    let data = users
+    delete data.password
+    let token = generateToken(data)
 
     if (verifyPassword) {
+      users.token = token
       delete users.password;
       delete users.otp;
       delete users.verif;
       delete users.created_at;
-      return next(ApiResult.success(`Login successful`));
+      return next(ApiResult.success(`Login successful`,users));
     }
 
     return next(ApiResult.badRequest(`Login failed`));

@@ -7,10 +7,12 @@ const {
   putDataRecipe,
   deleteDataRecipe,
 } = require("./../controller/recipesCon");
+const {protect} = require('../middleware/auth')
 
-router.get("/", getAllRecipes);
-router.get("/:id", getRecipeById);
-router.post("/", postDataRecipe);
-router.put("/:id", putDataRecipe);
-router.delete("/:id", deleteDataRecipe);
+
+router.get("/",protect, getAllRecipes);
+router.get('/my-recipe',protect,getRecipeById)
+router.post("/",protect, postDataRecipe);
+router.put("/:id",protect, putDataRecipe);
+router.delete("/:id",protect, deleteDataRecipe);
 module.exports = router;
