@@ -1,33 +1,37 @@
 const ApiResult = require("../middleware/error/ApiResult");
-const { findUser, createUser } = require("./../model/userModel");
+const { findUser, createUser, selectDataUserById, verifyUser } = require("./../model/userModel");
 const { v4: uuidv4 } = require("uuid");
 const argon2 = require("argon2");
-const generateToken = require('../helpers/generateToken')
-// const email = require("../middleware/email")
+const generateToken = require("../helpers/generateToken");
+ const email = require("../middleware/email")
 
 const UsersController = {
   registerUser: async (req, res, next) => {
     if (!req.body.email || !req.body.password || !req.body.name) {
-      next(ApiResult.badRequest(`Bad request, Email / Password / name missing`));
+      next(
+        ApiResult.badRequest(`Bad request, Email / Password / name missing`)
+      );
       return;
     }
 
-    // console.log(req.body.email);
-
+    //cek if email is registered
     let {
       rows: [users],
     } = await findUser(req.body.email);
-
     if (users) {
       next(ApiResult.unauthorized(`Email is registered, you may login.`));
       return;
     }
 
+    //create otp
+    let id = uuidv4();
+    let otp = Math.floor(100000 + Math.random() * 900000);
     let data = {
-      id: uuidv4(),
+      id,
       email: req.body.email,
       password: await argon2.hash(req.body.password),
       fullname: req.body.name,
+      otp,
     };
 
     let register = await createUser(data);
@@ -37,7 +41,21 @@ const UsersController = {
       return;
     }
 
-    return next(ApiResult.createSuccess(`Registration successful`));
+    try {
+      let url = `http://${process.env.BASE_URL}:${process.env.PORT}/auth/otp/${id}/${otp}`;
+      let sendEmail = email(req.body.email, otp, url, req.body.name);
+      if (sendEmail == "Email not sent") {
+        return next(
+          ApiResult.badRequest(`Registration failed, email was not sent`)
+        );
+      }
+      return next(
+        ApiResult.success(`Registration success, please check your email`)
+      );
+    } catch (error) {
+      console.log("reg gagal", error);
+      return next(ApiResult.badRequest(`Registration failed.`, error.message));
+    }
   },
 
   loginUser: async (req, res, next) => {
@@ -46,26 +64,58 @@ const UsersController = {
       return;
     }
 
-    let {
-      rows: [users],
-    } = await findUser(req.body.email);
-
+    //get users to check the data
+    let {rows: [users]} = await findUser(req.body.email);
+    if (!users) {
+      return next(ApiResult.badRequest(`Login failed, wrong email / password`));
+    }
     let verifyPassword = await argon2.verify(users.password, req.body.password);
-    let data = users
-    delete data.password
-    let token = generateToken(data)
+    let data = users;
+    delete data.password;
+    let token = generateToken(data);
+
 
     if (verifyPassword) {
-      users.token = token
+      users.token = token;
       delete users.password;
       delete users.otp;
-      delete users.verif;
       delete users.created_at;
-      return next(ApiResult.success(`Login successful`,users));
+      if(!users.verified){
+        return next(ApiResult.badRequest(`Login failed, please check your email to verify`));
+      }
+      return next(ApiResult.success(`Login successful`, users));
     }
 
     return next(ApiResult.badRequest(`Login failed`));
   },
+  otpUser: async (req,res,next)=>{
+    let id = req.params.id
+    let otp = req.params.code
+    
+
+    if(!id || !otp){
+        return next(ApiResult.badRequest(`Wrong OTP, please enter correct OTP`));
+    }
+
+    let {rows:[users]} =await selectDataUserById(id)
+
+    if(!users){
+        return next(ApiResult.badRequest(`User was not found`));
+    }
+
+    console.log(users.otp,otp)
+    if(users.otp == otp){
+        let verif =  await verifyUser(id)
+        if(verif){
+          return next(ApiResult.success(`User verified successfully`));
+        } else {
+            return next(ApiResult.badRequest(`User verification failed`));
+        }
+    } else {
+      return next(ApiResult.badRequest(`Wrong OTP, please enter correct OTP`));
+    }
+
+}
 };
 
 module.exports = UsersController;

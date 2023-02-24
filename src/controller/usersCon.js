@@ -39,24 +39,12 @@ const usersController = {
   getUserById: async (req, res, next) => {
     try {
       let id = req.params.id;
-      let foundUser = null;
-      //guard clause
-      if (isNaN(id)) {
-        next(ApiResult.badRequest(`Bad Request, id is not a number`));
-        return;
-      }
-      let showUser = await selectDataUserById(id);
-      showUser.rows.map((item) => {
-        if (item.id == id) {
-          foundUser = item;
-        }
-      });
-      console.log(showUser.rows);
-      if (!foundUser) {
+      let {rows:[users]} =await selectDataUserById(id)
+      if (!users) {
         next(ApiResult.badRequest(`Bad Request, data user not found`));
         return;
       }
-      next(ApiResult.success(`Data found`, showUser.rows));
+      next(ApiResult.success(`Data found`, users));
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }
