@@ -1,5 +1,5 @@
 const ApiResult = require("../middleware/error/ApiResult");
-
+const cloudinary = require("../config/uploadconfig");
 const {
   selectDataRecipe,
   insertDataRecipe,
@@ -39,35 +39,44 @@ const recipesController = {
   getRecipeById: async (req, res, next) => {
     try {
       let { searchBy, search, sortBy, sort } = req.query;
-    let data = {
-      searchBy: searchBy || "title",
-      search: search || "",
-      sortBy: sortBy || "created_at",
-      sort: sort || "ASC",
-      id: req.payload.id,
-    };
+      let data = {
+        searchBy: searchBy || "title",
+        search: search || "",
+        sortBy: sortBy || "created_at",
+        sort: sort || "ASC",
+        id: req.payload.id,
+      };
 
-    let result = await selectDataRecipeById(data);
+      let result = await selectDataRecipeById(data);
 
-    if (!result) {
-      return next(ApiResult.badRequest(`Get my recipe data failed`));
-    }
+      if (!result) {
+        return next(ApiResult.badRequest(`Get my recipe data failed`));
+      }
 
-    next(ApiResult.success(`Get my recipe successful` , result.rows));
+      next(ApiResult.success(`Get my recipe successful`, result.rows));
     } catch (error) {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
-    
   },
 
   postDataRecipe: async (req, res, next) => {
     try {
-      let data = {};
-      data.title = req.body.title;
-      data.ingredients = req.body.ingredients;
-      data.photo = req.body.photo;
-      data.users_id = req.payload.id;
-      data.categories_id = req.body.categories_id;
+      //upload file
+      const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: "recipes_images",
+      });
+      if (!imageUrl) {
+        next(
+          ApiResult.badRequest(`Insert data failed, failed to upload photo`)
+        );
+      }
+      let data = {
+        title: req.body.title,
+        ingredients: req.body.ingredients,
+        photo: imageUrl.secure_url,
+        users_id: req.payload.id,
+        categories_id: req.body.categories_id,
+      };
       let result = await insertDataRecipe(data);
       if (!result) {
         next(ApiResult.badRequest(`Failed to insert recipe data`));
@@ -81,11 +90,24 @@ const recipesController = {
 
   putDataRecipe: async (req, res, next) => {
     try {
-      let result;
       let id = req.params.id;
       let {
         rows: [recipes],
       } = await selectDataRecipeByIdForPut(id);
+      if (!req.file) {
+        req.body.photo = recipes.photo;
+      } else {
+        const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+          folder: "recipes_images",
+        });
+        if (!imageUrl) {
+          next(
+            ApiResult.badRequest(`Update data failed, failed to upload photo`)
+          );
+        }
+        req.body.photo = imageUrl.secure_url
+      }
+
       let data = {
         title: req.body.title || recipes.title,
         ingredients: req.body.ingredients || recipes.ingredients,
@@ -94,15 +116,15 @@ const recipesController = {
         users_id: req.payload.id || recipes.users_id,
         categories_id: req.body.categories_id || recipes.categories_id,
       };
-      if(req.payload.id !== recipes.users_id){
+      if (req.payload.id !== recipes.users_id) {
         return next(ApiResult.badRequest(`You don't own this recipe!`));
       }
-
-      result = await updateDataRecipe(id, data);
+      let result = await updateDataRecipe(id, data);
       if (!result) {
         next(ApiResult.badRequest(`Update data recipe failed`));
       }
-      next(ApiResult.success(`Update data recipe successful`))
+      let cekdata = await selectDataRecipeByIdForPut(id)
+      next(ApiResult.success(`Update data recipe successful`, cekdata.rows));
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }

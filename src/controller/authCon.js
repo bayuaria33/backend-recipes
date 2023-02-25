@@ -83,7 +83,7 @@ const UsersController = {
       if(!users.verified){
         return next(ApiResult.badRequest(`Login failed, please check your email to verify`));
       }
-      return next(ApiResult.success(`Login successful`, users));
+      return next(ApiResult.success(`Login successful, welcome ${users.fullname}`, users));
     }
 
     return next(ApiResult.badRequest(`Login failed`));

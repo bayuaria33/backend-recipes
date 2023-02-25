@@ -19,6 +19,7 @@ app.use(xss());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', mainRoute);
+app.use('/img',express.static('./tmp'))
 
 app.get("/", (req, res, next) => {
   next(ApiResult.success(`Success`));
