@@ -4,9 +4,10 @@ const Pool = require("./../config/dbconfig");
 const selectDataRecipe = (data) => {
   let {searchBy,search,sortBy,sort} = data
   return Pool.query(
-    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category 
+    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category, users.fullname as author 
     FROM recipes 
     JOIN categories ON recipes.categories_id=categories.id
+    JOIN users ON recipes.users_id = users.id
     WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort}`
   );
 }
@@ -14,9 +15,10 @@ const selectDataRecipe = (data) => {
 const selectDataRecipeById = (data) => {
   let {searchBy,search,sortBy,sort,id} = data
   return Pool.query(
-    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category 
+    `SELECT recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category , users.fullname as author
     FROM recipes 
     JOIN categories ON recipes.categories_id=categories.id
+    JOIN users ON recipes.users_id = users.id
     WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.users_id='${id}' ORDER BY recipes.${sortBy} ${sort}`
   );
 }

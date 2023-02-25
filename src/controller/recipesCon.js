@@ -31,28 +31,33 @@ const recipesController = {
         );
         return;
       }
-      next(ApiResult.success(`Data recipe found`, showRecipe.rows))
+      next(ApiResult.success(`Data recipe found`, showRecipe.rows));
     } catch (error) {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
-    getRecipeById: async (req,res,next) => {
-      let {searchBy,search,sortBy,sort} = req.query
-      let data = {
-          searchBy: searchBy || 'title',
-          search: search || '',
-          sortBy: sortBy || 'created_at',
-          sort: sort || 'ASC',
-          id: req.payload.id
-      }
+  getRecipeById: async (req, res, next) => {
+    try {
+      let { searchBy, search, sortBy, sort } = req.query;
+    let data = {
+      searchBy: searchBy || "title",
+      search: search || "",
+      sortBy: sortBy || "created_at",
+      sort: sort || "ASC",
+      id: req.payload.id,
+    };
 
-      let result = await selectDataRecipeById(data)
+    let result = await selectDataRecipeById(data);
 
-      if(!result){
-          res.status(404).json({status:404,message:`get data failed`})
-      }
+    if (!result) {
+      return next(ApiResult.badRequest(`Get my recipe data failed`));
+    }
 
-      res.status(200).json({status:200,message:`get data success `,data:result.rows})
+    next(ApiResult.success(`Get my recipe successful` , result.rows));
+    } catch (error) {
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
+    }
+    
   },
 
   postDataRecipe: async (req, res, next) => {
@@ -68,7 +73,7 @@ const recipesController = {
         next(ApiResult.badRequest(`Failed to insert recipe data`));
         return;
       }
-      next(ApiResult.success(`Data inserted successfully`))
+      next(ApiResult.success(`Data inserted successfully`));
     } catch (error) {
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
@@ -89,13 +94,15 @@ const recipesController = {
         users_id: req.payload.id || recipes.users_id,
         categories_id: req.body.categories_id || recipes.categories_id,
       };
+      if(req.payload.id !== recipes.users_id){
+        return next(ApiResult.badRequest(`You don't own this recipe!`));
+      }
+
       result = await updateDataRecipe(id, data);
       if (!result) {
         next(ApiResult.badRequest(`Update data recipe failed`));
       }
-      let checkData = await selectDataRecipeById(id);
-      console.log(`cek data = ${checkData}`);
-      next(ApiResult.success(`Update data recipe successful`, checkData.rows))
+      next(ApiResult.success(`Update data recipe successful`))
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }
@@ -116,7 +123,7 @@ const recipesController = {
         next(ApiResult.badRequest(`Delete data recipe failed`));
         return;
       }
-      next(ApiResult.success(`Delete data recipe successful`, `${id} deleted`))
+      next(ApiResult.success(`Delete data recipe successful`, `${id} deleted`));
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }

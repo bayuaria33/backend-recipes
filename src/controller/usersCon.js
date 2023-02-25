@@ -13,9 +13,9 @@ const usersController = {
     try {
       let { searchBy, search, sortBy, sort } = req.query;
       let data = {
-        searchBy: searchBy || "name",
+        searchBy: searchBy || "fullname",
         search: search || "",
-        sortBy: sortBy || "name",
+        sortBy: sortBy || "fullname",
         sort: sort || "DESC",
       };
       data.page = parseInt(req.query.page) || 1;
@@ -38,8 +38,11 @@ const usersController = {
 
   getUserById: async (req, res, next) => {
     try {
-      let id = req.params.id;
-      let {rows:[users]} =await selectDataUserById(id)
+      let id = req.payload.id;
+      console.log(id);
+      let {
+        rows: [users],
+      } = await selectDataUserById(id);
       if (!users) {
         next(ApiResult.badRequest(`Bad Request, data user not found`));
         return;
@@ -86,7 +89,7 @@ const usersController = {
 
   putDataUser: async (req, res, next) => {
     try {
-      let id = req.params.id;
+      let id = req.payload.id;
       let {
         rows: [users],
       } = await selectDataUserById(id);
@@ -96,10 +99,9 @@ const usersController = {
       }
       //cek if undefined
       let data = {
-        name: req.body.name || users.name,
+        fullname: req.body.fullname || users.fullname,
         email: req.body.email || users.email,
-        phonenumber: req.body.phonenumber || users.phonenumber,
-        password: req.body.password || users.password,
+        photo: req.body.photo || users.photo,
       };
       result = await updateDataUser(id, data);
       if (!result) {

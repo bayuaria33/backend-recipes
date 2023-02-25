@@ -1,9 +1,17 @@
 const { query } = require("express");
 const Pool = require("./../config/dbconfig");
 
+// const selectDataUser = (data) => {
+//   let { searchBy, search, sortBy, sort, limit, offset } = data;
+//   let qry = `SELECT id,name,email,phonenumber FROM old_users WHERE old_users.${searchBy} ILIKE '%${search}%' AND old_users.deleted_at IS NULL ORDER BY old_users.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+//   return Pool.query(qry);
+// };
+
 const selectDataUser = (data) => {
   let { searchBy, search, sortBy, sort, limit, offset } = data;
-  let qry = `SELECT id,name,email,phonenumber FROM old_users WHERE old_users.${searchBy} ILIKE '%${search}%' AND old_users.deleted_at IS NULL ORDER BY old_users.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at 
+  FROM users 
+  WHERE users.${searchBy} ILIKE '%${search}%' AND users.deleted_at IS NULL ORDER BY users.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
   return Pool.query(qry);
 };
 
@@ -21,8 +29,8 @@ const insertDataUser = (data) => {
 };
 
 const updateDataUser = (id, data) => {
-  let { name, email, phonenumber, password } = data;
-  let qry = `UPDATE old_users SET name='${name}',email='${email}',phonenumber='${phonenumber}',password='${password}' WHERE id=${id}`;
+  let { fullname, email, photo} = data;
+  let qry = `UPDATE users SET fullname='${fullname}',email='${email}',photo='${photo}' WHERE id='${id}'`;
   // console.log(data, qry);
   return Pool.query(qry);
 };
@@ -36,16 +44,17 @@ const deleteDataUser = (id) => {
 /////////////////////
 
 const selectDataUserById = (id) => {
-  return new Promise((resolve,reject)=>
-  Pool.query(`SELECT * FROM users WHERE id='${id}'`,
-  (err,result)=>{
-    if(!err){
-      resolve(result)
-    } else {
-      reject(err)
-    }
-  }))
-}
+  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at FROM users WHERE id='${id}'`
+  return new Promise((resolve, reject) =>
+    Pool.query(qry, (err, result) => {
+      if (!err) {
+        resolve(result);
+      } else {
+        reject(err);
+      }
+    })
+  );
+};
 
 const findUser = (email) => {
   let qry = `SELECT * FROM users WHERE email='${email}'`;
@@ -75,8 +84,8 @@ const createUser = (data) => {
   );
 };
 
-const verifyUser = (id)=>{
-  let qry = `UPDATE users SET verified = true WHERE id='${id}'`
+const verifyUser = (id) => {
+  let qry = `UPDATE users SET verified = true WHERE id='${id}'`;
   return new Promise((resolve, reject) =>
     Pool.query(qry, (err, result) => {
       if (!err) {
@@ -86,7 +95,7 @@ const verifyUser = (id)=>{
       }
     })
   );
-}
+};
 
 module.exports = {
   selectDataUser,
@@ -96,5 +105,5 @@ module.exports = {
   deleteDataUser,
   createUser,
   findUser,
-  verifyUser
+  verifyUser,
 };
