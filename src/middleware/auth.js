@@ -28,5 +28,11 @@ const protect = (req, res, next) => {
     }
   }
 };
+const cekRole = (req,res,next) => {
+  if(req.params.role == 'admin' || req.params.role == 'user' ){
+      return next()
+  }
+  return response(res, 404, false, null,"Invalid user role")
+}
 
-module.exports = { protect };
+module.exports = { protect,cekRole};

@@ -9,7 +9,7 @@ const Pool = require("./../config/dbconfig");
 
 const selectDataUser = (data) => {
   let { searchBy, search, sortBy, sort, limit, offset } = data;
-  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at 
+  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at,role
   FROM users 
   WHERE users.${searchBy} ILIKE '%${search}%' AND users.deleted_at IS NULL ORDER BY users.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
   return Pool.query(qry);
@@ -44,7 +44,8 @@ const deleteDataUser = (id) => {
 /////////////////////
 
 const selectDataUserById = (id) => {
-  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at FROM users WHERE id='${id}'`
+  let qry = `SELECT id,email,fullname,photo,verified,otp,created_at,role 
+  FROM users WHERE id='${id}'`
   return new Promise((resolve, reject) =>
     Pool.query(qry, (err, result) => {
       if (!err) {
@@ -70,8 +71,9 @@ const findUser = (email) => {
 };
 
 const createUser = (data) => {
-  const { email, fullname, password, otp, id } = data;
-  let qry = `INSERT INTO users(id,email,fullname,password,otp,created_at) VALUES('${id}','${email}','${fullname}','${password}','${otp}', NOW()::timestamp)`;
+  const { email, fullname, password, otp, id,role } = data;
+  let qry = `INSERT INTO users(id,email,fullname,password,otp,created_at,role) 
+  VALUES('${id}','${email}','${fullname}','${password}','${otp}', NOW()::timestamp,'${role}')`;
   console.log(data);
   return new Promise((resolve, reject) =>
     Pool.query(qry, (err, result) => {
