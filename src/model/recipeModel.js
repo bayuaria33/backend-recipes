@@ -41,9 +41,6 @@ const updateDataRecipe = (id, data) => {
   let { title, ingredients, photo, users_id, categories_id, created_at } = data;
   created_at = created_at.toISOString();
   let qry = `UPDATE recipes SET title='${title}',ingredients='${ingredients}',photo='${photo}',users_id='${users_id}',categories_id =${categories_id},created_at='${created_at}' WHERE id=${id}`;
-  console.log(`data, query = `);
-  console.log(data, qry);
-  console.log(`created at : ${created_at}`);
   return Pool.query(qry);
 };
 

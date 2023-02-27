@@ -8,6 +8,8 @@ const {
   updateDataRecipe,
   deleteDataRecipe,
 } = require("../model/recipeModel");
+const path = require("path");
+const multer = require("multer");
 
 const recipesController = {
   getAllRecipes: async (req, res, next) => {
@@ -59,9 +61,13 @@ const recipesController = {
     }
   },
 
-  postDataRecipe: async (req, res, next) => {
+  postDataRecipe: async (error, req, res, next) => {
     try {
       //upload file
+      if(req.fileValidationError){
+        next(ApiResult.badRequest(`file validation error`));
+        return;
+      }
       const imageUrl = await cloudinary.uploader.upload(req.file.path, {
         folder: "recipes_images",
       });
@@ -84,6 +90,9 @@ const recipesController = {
       }
       next(ApiResult.success(`Data inserted successfully`));
     } catch (error) {
+      if(error instanceof multer.MulterError){
+        res.status(400).send('There was an error uploading the file!');
+      }
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
@@ -93,11 +102,16 @@ const recipesController = {
       let id = req.params.id;
       let {
         rows: [recipes],
-      } = await selectDataRecipeByIdForPut(id);
+      } = await selectDataRecipeByIdForPut(id);    
       if (!req.file) {
         req.body.photo = recipes.photo;
       } else {
-        const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+        console.log(req.file);
+        let file = req.file;
+        let ext = path.extname(file.name);
+        let allowedType =['.png','.jpg','.jpeg']
+        if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg: "Invalid Images"});
+        const imageUrl = await cloudinary.uploader.upload(file.path, {
           folder: "recipes_images",
         });
         if (!imageUrl) {
