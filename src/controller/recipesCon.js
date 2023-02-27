@@ -61,18 +61,18 @@ const recipesController = {
     }
   },
 
-  postDataRecipe: async (error, req, res, next) => {
+  postDataRecipe: async (req, res, next) => {
     try {
       //upload file
-      if(req.fileValidationError){
-        next(ApiResult.badRequest(`file validation error`));
-        return;
-      }
+      console.log('req valid',req.isFileValid)
+        if(!req.isFileValid){
+            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+        }
       const imageUrl = await cloudinary.uploader.upload(req.file.path, {
         folder: "recipes_images",
       });
       if (!imageUrl) {
-        next(
+        return next(
           ApiResult.badRequest(`Insert data failed, failed to upload photo`)
         );
       }
@@ -90,9 +90,6 @@ const recipesController = {
       }
       next(ApiResult.success(`Data inserted successfully`));
     } catch (error) {
-      if(error instanceof multer.MulterError){
-        res.status(400).send('There was an error uploading the file!');
-      }
       next(ApiResult.badRequest(`Error, message: ${error.message}`));
     }
   },
@@ -104,14 +101,16 @@ const recipesController = {
         rows: [recipes],
       } = await selectDataRecipeByIdForPut(id);    
       if (!req.file) {
+        if(!req.isFileValid){
+            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+        }
         req.body.photo = recipes.photo;
       } else {
-        console.log(req.file);
-        let file = req.file;
-        let ext = path.extname(file.name);
-        let allowedType =['.png','.jpg','.jpeg']
-        if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg: "Invalid Images"});
-        const imageUrl = await cloudinary.uploader.upload(file.path, {
+        console.log('req valid',req.isFileValid)
+        if(!req.isFileValid){
+            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+        }
+        const imageUrl = await cloudinary.uploader.upload(req.file.path, {
           folder: "recipes_images",
         });
         if (!imageUrl) {
@@ -121,7 +120,6 @@ const recipesController = {
         }
         req.body.photo = imageUrl.secure_url
       }
-
       let data = {
         title: req.body.title || recipes.title,
         ingredients: req.body.ingredients || recipes.ingredients,

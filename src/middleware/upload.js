@@ -15,13 +15,15 @@ const upload = multer({
   storage,
   limits: { fileSize: 10 * Math.pow(1024, 4) },
   fileFilter: (req, file, cb) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      const err = new Error('Only image files are allowed!');
-      err.status = 400;
-      return cb(err, false);
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image.jfif') {
+        cb(null, true);
+        req.isFileValid = true
+    } else {
+        req.isFileValid = false
+        req.isFileValidMessage = 'Only PNG / JPG / JPEG images are allowed'
+        return cb(null, false);
     }
-    cb(null, true);
-  }
+    },
 });
 
-module.exports = upload;
+module.exports = {upload};
