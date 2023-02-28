@@ -1,4 +1,4 @@
-<h1 align="center">backend-recipe</h1>
+<h1 align="center">backend-recipes</h1>
 
 # Pijar Camp Backend - Tugas
 
