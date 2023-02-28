@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const ApiResult = require("../middleware/error/ApiResult");
 let accessKey = process.env.JWT_ACCESS_KEY;
-let refreshKey = process.env.JWT_REFRESH_KEY;
 
 const protect = (req, res, next) => {
   try {
@@ -30,19 +29,11 @@ const protect = (req, res, next) => {
   }
 };
 
-const refreshUserToken = (req,res,next) =>{
-  try {
-    
-  } catch (error) {
-    
-  }
-}
-
 const cekRole = (req,res,next) => {
   if(req.params.role == 'admin' || req.params.role == 'user' ){
       return next()
   }
-  return response(res, 404, false, null,"Invalid user role")
+  return res(res, 404, false, null,"Invalid user role")
 }
 
 module.exports = { protect,cekRole};

@@ -66,7 +66,7 @@ const categoriesController = {
         next(ApiResult.badRequest(`Failed to insert category data`));
         return;
       }
-      next(ApiResult.success(`Data inserted successfully`, `${id} deleted`))
+      next(ApiResult.success(`Data inserted successfully`, `${data.id} deleted`))
     } catch (error) {
       next(ApiResult.badRequest(`Error, message = ${error.message}`));
     }

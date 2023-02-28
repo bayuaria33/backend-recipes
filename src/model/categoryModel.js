@@ -1,4 +1,3 @@
-const { query } = require("express");
 const Pool = require("./../config/dbconfig");
 
 const selectDataCategory = (data) => {

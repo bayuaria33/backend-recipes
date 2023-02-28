@@ -3,10 +3,8 @@ const router = express.Router();
 const {protect} = require('../middleware/auth')
 const {
   getAllUsers,
-  postDataUser,
   getUserById,
   putDataUser,
-  deleteDataUser,
 } = require("./../controller/usersCon");
 
 router.get("/", getAllUsers);

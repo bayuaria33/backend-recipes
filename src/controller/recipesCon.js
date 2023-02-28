@@ -8,8 +8,6 @@ const {
   updateDataRecipe,
   deleteDataRecipe,
 } = require("../model/recipeModel");
-const path = require("path");
-const multer = require("multer");
 
 const recipesController = {
   getAllRecipes: async (req, res, next) => {

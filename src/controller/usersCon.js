@@ -103,7 +103,7 @@ const usersController = {
         email: req.body.email || users.email,
         photo: req.body.photo || users.photo,
       };
-      result = await updateDataUser(id, data);
+      let result = await updateDataUser(id, data);
       if (!result) {
         next(ApiResult.badRequest(`Update data user failed`));
         return;
