@@ -62,7 +62,7 @@ const recipesController = {
   postDataRecipe: async (req, res, next) => {
     try {
       //upload file
-      console.log('req valid',req.isFileValid)
+      // console.log('req valid',req.isFileValid)
         if(!req.isFileValid){
             return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
         }
@@ -104,7 +104,7 @@ const recipesController = {
         }
         req.body.photo = recipes.photo;
       } else {
-        console.log('req valid',req.isFileValid)
+        // console.log('req valid',req.isFileValid)
         if(!req.isFileValid){
             return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
         }
