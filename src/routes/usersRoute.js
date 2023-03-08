@@ -12,6 +12,4 @@ router.get("/myprofile",protect, getUserById);
 // router.post("/", postDataUser);
  router.put("/update",protect, putDataUser);
 // router.delete("/:id", deleteDataUser);
-
-
 module.exports = router;

@@ -15,3 +15,5 @@ router.get("/my-recipe", protect, getRecipeById);
 router.post("/", protect, upload.single("photo"), postDataRecipe);
 router.put("/:id", protect, upload.single("photo"), putDataRecipe);
 router.delete("/:id", protect, deleteDataRecipe);
+
+module.exports = router
