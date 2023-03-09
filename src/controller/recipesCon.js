@@ -150,6 +150,9 @@ const recipesController = {
         next(ApiResult.badRequest(`Recipe with id ${id} does not exist`));
         return;
       }
+      if (req.payload.id !== recipes.users_id) {
+        return next(ApiResult.badRequest(`You don't own this recipe!`));
+      }
       let result = await deleteDataRecipe(id);
       if (!result) {
         next(ApiResult.badRequest(`Delete data recipe failed`));
