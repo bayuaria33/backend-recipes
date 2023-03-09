@@ -6,7 +6,7 @@ let refreshKey = process.env.JWT_REFRESH_KEY;
 
 const generateAccessToken = (payload) => {
   const verifyOpts = {
-    expiresIn: "1h",
+    expiresIn: "30d",
   };
   const accessToken = jwt.sign(payload, accessKey, verifyOpts);
   return accessToken;
