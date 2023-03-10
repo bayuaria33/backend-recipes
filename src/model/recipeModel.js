@@ -25,7 +25,7 @@ const selectDataRecipeById = (data) => {
 const selectDataRecipeByRecipeId = (data) => {
   let { searchBy, search, sortBy, sort} = data;
   return Pool.query(
-    `SELECT recipes.id, recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category, users.fullname as author, recipes.photo 
+    `SELECT recipes.id, recipes.title, recipes.ingredients, recipes.users_id, recipes.categories_id, recipes.created_at as posttime, categories.category_name as category, users.fullname as author, recipes.photo 
     FROM recipes 
     JOIN categories ON recipes.categories_id=categories.id
     JOIN users ON recipes.users_id = users.id
