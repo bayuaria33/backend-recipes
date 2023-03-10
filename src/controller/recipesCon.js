@@ -4,6 +4,7 @@ const {
   selectDataRecipe,
   insertDataRecipe,
   selectDataRecipeById,
+  selectDataRecipeByRecipeId,
   selectDataRecipeByIdForPut,
   updateDataRecipe,
   deleteDataRecipe,
@@ -48,6 +49,28 @@ const recipesController = {
       };
 
       let result = await selectDataRecipeById(data);
+
+      if (!result) {
+        return next(ApiResult.badRequest(`Get my recipe data failed`));
+      }
+
+      next(ApiResult.success(`Get my recipe successful`, result.rows));
+    } catch (error) {
+      next(ApiResult.badRequest(`Error, message: ${error.message}`));
+    }
+  },
+
+  getRecipeByRecipeId: async (req, res, next) => {
+    try {
+      let { searchBy, search, sortBy, sort } = req.query;
+      let data = {
+        searchBy: searchBy || "id",
+        search: search || req.params.id,
+        sortBy: sortBy || "created_at",
+        sort: sort || "ASC"
+      };
+
+      let result = await selectDataRecipeByRecipeId(data);
 
       if (!result) {
         return next(ApiResult.badRequest(`Get my recipe data failed`));
