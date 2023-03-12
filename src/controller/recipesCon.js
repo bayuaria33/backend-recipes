@@ -122,14 +122,14 @@ const recipesController = {
         rows: [recipes],
       } = await selectDataRecipeByIdForPut(id);    
       if (!req.file) {
-        if(!req.isFileValid){
-            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
-        }
+        // if(!req.isFileValid){
+        //     return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+        // }
         req.body.photo = recipes.photo;
       } else {
         // console.log('req valid',req.isFileValid)
         if(!req.isFileValid){
-            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `File type invalid`}`})
         }
         const imageUrl = await cloudinary.uploader.upload(req.file.path, {
           folder: "recipes_images",
