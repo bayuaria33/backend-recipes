@@ -65,6 +65,11 @@ const getCountRecipe = () => {
   return Pool.query(qry);
 };
 
+const getCountMyRecipe = (id) => {
+  let qry = `SELECT count(*) FROM recipes WHERE recipes.users_id='${id}' AND deleted_at IS NULL LIMIT 100 OFFSET 0`;
+  return Pool.query(qry);
+};
+
 module.exports = {
   selectDataRecipe,
   insertDataRecipe,
@@ -73,5 +78,6 @@ module.exports = {
   selectDataRecipeByIdForPut,
   updateDataRecipe,
   deleteDataRecipe,
-  getCountRecipe
+  getCountRecipe,
+  getCountMyRecipe
 };

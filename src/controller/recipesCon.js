@@ -8,7 +8,8 @@ const {
   selectDataRecipeByIdForPut,
   updateDataRecipe,
   deleteDataRecipe,
-  getCountRecipe
+  getCountRecipe,
+  getCountMyRecipe
 } = require("../model/recipeModel");
 
 const recipesController = {
@@ -195,7 +196,19 @@ const recipesController = {
       let {
         rows: [data],
       } = await getCountRecipe();
-      next(ApiResult.success(`Get existing recipe succesfull`,data.count))
+      next(ApiResult.success(`Get count existing recipe succesful`,data.count))
+    } catch (error) {
+      next(ApiResult.badRequest(error.message));
+    }
+  },
+
+  countMyRecipe: async (req, res, next) => {
+    try {
+      let id = req.payload.id
+      let {
+        rows: [data],
+      } = await getCountMyRecipe(id);
+      next(ApiResult.success(`Get count existing recipe user succesful`,data.count))
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }
