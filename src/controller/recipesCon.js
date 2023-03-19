@@ -8,6 +8,7 @@ const {
   selectDataRecipeByIdForPut,
   updateDataRecipe,
   deleteDataRecipe,
+  getCountRecipe
 } = require("../model/recipeModel");
 
 const recipesController = {
@@ -188,6 +189,17 @@ const recipesController = {
       next(ApiResult.badRequest(error.message));
     }
   },
+
+  countRecipe: async (req, res, next) => {
+    try {
+      let {
+        rows: [data],
+      } = await getCountRecipe();
+      next(ApiResult.success(data.count))
+    } catch (error) {
+      next(ApiResult.badRequest(error.message));
+    }
+  }
 };
 
 module.exports = recipesController;
