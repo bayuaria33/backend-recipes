@@ -195,7 +195,7 @@ const recipesController = {
       let {
         rows: [data],
       } = await getCountRecipe();
-      next(ApiResult.success(data.count))
+      next(ApiResult.success(`Get existing recipe succesfull`,data.count))
     } catch (error) {
       next(ApiResult.badRequest(error.message));
     }
