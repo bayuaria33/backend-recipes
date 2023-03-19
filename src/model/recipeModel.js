@@ -1,24 +1,24 @@
 const Pool = require("./../config/dbconfig");
 
 const selectDataRecipe = (data) => {
-  let { searchBy, search, sortBy, sort } = data;
+  let { searchBy, search, sortBy, sort, limit, offset } = data;
   return Pool.query(
     `SELECT recipes.id, recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category, users.fullname as author,recipes.photo, users.photo as user_photo
     FROM recipes 
     JOIN categories ON recipes.categories_id=categories.id
     JOIN users ON recipes.users_id = users.id
-    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort}`
+    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL ORDER BY recipes.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`
   );
 };
 
 const selectDataRecipeById = (data) => {
-  let { searchBy, search, sortBy, sort, id } = data;
+  let { searchBy, search, sortBy, sort, id, limit, offset} = data;
   return Pool.query(
     `SELECT recipes.id, recipes.title,recipes.ingredients,recipes.created_at as posttime, categories.category_name as category , users.fullname as author, recipes.photo, users.photo as user_photo
     FROM recipes 
     JOIN categories ON recipes.categories_id=categories.id
     JOIN users ON recipes.users_id = users.id
-    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.users_id='${id}' ORDER BY recipes.${sortBy} ${sort}`
+    WHERE recipes.${searchBy} ILIKE '%${search}%' AND recipes.deleted_at IS NULL AND recipes.users_id='${id}' ORDER BY recipes.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`
   );
 };
 

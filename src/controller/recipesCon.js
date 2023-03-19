@@ -47,7 +47,9 @@ const recipesController = {
         sort: sort || "ASC",
         id: req.payload.id,
       };
-
+      data.page = parseInt(req.query.page) || 1;
+      data.limit = parseInt(req.query.limit) || 10;
+      data.offset = (data.page - 1) * data.limit;
       let result = await selectDataRecipeById(data);
 
       if (!result) {
