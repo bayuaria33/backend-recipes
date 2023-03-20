@@ -22,12 +22,13 @@ module.exports = (emailClient, subject, url, name) => {
     transporter.sendMail(mailOption, function (error, data) {
       if (error) {
         reject(error.message);
+        return("Email not sent")
       } else {
         resolve(data);
       }
     });
   }).then((data) => {
-    console.log("Email sent successfully");
+    console.log("Email sent successfully, data = ", data);
     return data;
   });
 
