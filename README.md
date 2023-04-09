@@ -62,3 +62,4 @@ PHOTO_NAME=
 PHOTO_KEY=
 PHOTO_SECRET=
 ```
+frontend= https://github.com/bayuaria33/frontend-recipes-react
