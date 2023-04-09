@@ -213,6 +213,17 @@ const recipesController = {
       next(ApiResult.badRequest(error.message));
     }
   }
+  // countMyRecipe: async (req, res, next) => {
+  //   try {
+  //     let id = req.payload.id
+  //     let {
+  //       rows: [data],
+  //     } = await getCountMyRecipe(id);
+  //     next(ApiResult.success(`Get count existing recipe user succesful`,data.count))
+  //   } catch (error) {
+  //     next(ApiResult.badRequest(error.message));
+  //   }
+  // }
 };
 
 module.exports = recipesController;
