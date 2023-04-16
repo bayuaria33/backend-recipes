@@ -1,4 +1,7 @@
 const ApiResult = require("../middleware/error/ApiResult");
+const cloudinary = require("../config/uploadconfig");
+const mailer = require("../middleware/email");
+const argon2 = require("argon2");
 // next(ApiResult.[tiperesult](message,data));
 const {
   selectDataUser,
@@ -6,6 +9,9 @@ const {
   selectDataUserById,
   updateDataUser,
   deleteDataUser,
+  findUser,
+  checkOTP,
+  changePassword,
 } = require("../model/userModel");
 
 const usersController = {
@@ -97,6 +103,29 @@ const usersController = {
         next(ApiResult.badRequest(`User with id ${id} does not exist`));
         return;
       }
+      if (!req.file) {
+        // if(!req.isFileValid){
+        //     return res.status(404).json({status:404,message:`${req.isFileValidMessage || `No file detected / file type invalid`}`})
+        // }
+        req.body.photo = users.photo;
+      } else {
+        // console.log('req valid',req.isFileValid)
+        if(!req.isFileValid){
+            return res.status(404).json({status:404,message:`${req.isFileValidMessage || `File type invalid`}`})
+        }
+        const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+          folder: "recipes_images",
+        });
+        if (!imageUrl) {
+          next(
+            ApiResult.badRequest(`Update data failed, failed to upload photo`)
+          );
+        }
+        req.body.photo = imageUrl.secure_url
+      }
+
+
+
       //cek if undefined
       let data = {
         fullname: req.body.fullname || users.fullname,
@@ -133,6 +162,82 @@ const usersController = {
       next(ApiResult.success(`Delete data user successful`, `${id} deleted`));
     } catch (error) {
       next(ApiResult.badRequest(error.message));
+    }
+  },
+  getOTPbyEmail: async (req, res,next) => {
+    try {
+      let email = req.body.email
+      if(!email){
+       res.status(404).json({msg: "Please input email"});
+      }
+      let {
+        rows: [users],
+      } = await findUser(email);
+      if (!users) {
+         res.status(400).json({msg: `Failed get user. email ${email} doesn't exist`});
+      }
+      const data = {
+        otp:users.otp,
+        email:email
+      }
+      try {
+        let sendEmail = mailer(users.email, users.otp)
+          if(sendEmail == 'email not send'){
+              res.status(404).json({status:404,message:`Failed to send email`})                
+          } else {
+            res.status(200).json({msg: "Email sent, check your email", data:data});
+          }
+      } catch (error) {
+       res.status(400).json({where: `Error sending otp`, msg:error.message, data: error.data});
+      }
+      // console.log(response);
+    } catch (error) {
+      next(error.message);
+    }
+  },
+  verifyEmailOTP: async (req,res,next)=>{
+    try {
+        if (!req.body.email || !req.body.otp) {
+            res.status(404).json({status:404,message:`Please fill your email and OTP`})
+        } else {
+          let data = {
+            email:req.body.email,
+            otp:req.body.otp
+          }
+          let result = await checkOTP(data)
+            if (result.rows.length === 0) {
+                res.status(404).json({status:404,message:`OTP is incorrect, please check again`})
+            } else {
+                res.status(200).json({status:200,message:`Confirm OTP success`,data:result.rows})
+            }
+        }
+    } catch (error) {
+      next(error.message);
+    }
+},
+
+  changePassword: async (req,res,next)=>{
+    try {
+      if (!req.body.email || !req.body.password || !req.body.confirm) {
+          res.status(400).json({status:400,message:`Please fill the required fields.`})
+      }
+      if(req.body.password != req.body.confirm){
+        res.status(400).json({status:400,message:`Confirmed password is incorrect`})
+      }
+
+      let data = {
+        email: req.body.email,
+        password: await argon2.hash(req.body.password)
+      }
+      let result = await changePassword(data)
+      console.log(result);
+        if (!result) {
+            res.status(404).json({status:404,message:`Password reset failed`})
+        } else {
+            res.status(200).json({status:200,message:`Password reset successful`})
+        }
+    } catch (error) {
+      next(error.message);
     }
   },
 };
