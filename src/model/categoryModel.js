@@ -2,7 +2,7 @@ const Pool = require("./../config/dbconfig");
 
 const selectDataCategory = (data) => {
   let { searchBy, search, sortBy, sort, limit, offset } = data;
-  return Pool.query(`SELECT id, category_name FROM categories WHERE categories.${searchBy} ILIKE '%${search}%' AND categories.deleted_at IS NULL ORDER BY categories.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`);
+  return Pool.query(`SELECT id, category_name, color, icon FROM categories WHERE categories.${searchBy} ILIKE '%${search}%' AND categories.deleted_at IS NULL ORDER BY categories.${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`);
 };
 
 const selectDataCategoryById = (data) => {
